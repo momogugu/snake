@@ -10,6 +10,7 @@ class Snake {
 			x: -1,
 			y: 0
 		}
+		this.isAuto = true
 		this.keys = {}
 		this.actions = {}
 		window.addEventListener('keydown', (event) => {
@@ -103,15 +104,16 @@ class Snake {
 					this.actions[key]()
 				}
 			}
-		}, 1000/30)
+			this.move()
+		}, 1000/5)
 	}
 	// snake move
-	move(x,y) {
+	move() {
 		var snake = this.snakeGrid
 		var headX = this.snakeGrid[0][1]
 		var headY = this.snakeGrid[0][0]
-		headX += x
-		headY += y
+		headX += this.direction.x
+		headY += this.direction.y
 		// log(headX, headY, x, y)
 		if(this.eatFood()) {
 			log('food')
@@ -137,25 +139,21 @@ class Snake {
 	}
 	moveRight() {
 		if(this.direction.x == -1) return
-		this.move(+1, 0)
 		this.direction.x = +1
 		this.direction.y = 0
 	}
 	moveLeft() {
 		if(this.direction.x == +1) return
-		this.move(-1, 0)
 		this.direction.x = -1
 		this.direction.y = 0
 	}
 	moveUp() {
 		if(this.direction.y == +1) return
-		this.move(0, -1)
 		this.direction.x = 0
 		this.direction.y = -1
 	}
 	moveDown() {
 		if(this.direction.y == -1) return
-		this.move(0, +1)
 		this.direction.x = 0
 		this.direction.y = +1
 	}
@@ -170,9 +168,9 @@ class Snake {
 		for (var i = 0; i < classnames.length; i++) {
 			var classname = classnames[i]
 			var e = document.querySelectorAll('.'+classname)
-			for (var i = 0; i < e.length; i++) {
+			for (var j = 0; j < e.length; j++) {
 				// log(e[i].classList)
-				e[i].classList.remove(classname)
+				e[j].classList.remove(classname)
 			}
 		}
 	}
