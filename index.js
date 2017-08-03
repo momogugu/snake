@@ -10,7 +10,9 @@ class Snake {
 			x: -1,
 			y: 0
 		}
-		this.isAuto = true
+		this.paused = true
+		// 游戏结束
+		this.end = false
 		this.keys = {}
 		this.actions = {}
 		window.addEventListener('keydown', (event) => {
@@ -66,7 +68,10 @@ class Snake {
 	}
 	// init food
 	initFood() {
-		this.foodGrid.push([10, 10])
+		this.foodGrid = []
+		var x = Math.floor(Math.random()*20)
+		var y = Math.floor(Math.random()*20)
+		this.foodGrid.push([x, y])
 		this.drawFood()
 	}
 	// init snake
@@ -94,9 +99,12 @@ class Snake {
 		this.registeraction('a', this.moveLeft.bind(this))
 		this.registeraction('w', this.moveUp.bind(this))
 		this.registeraction('s', this.moveDown.bind(this))
+		this.registeraction(' ', () => {
+			this.paused = !this.paused
+		})
 	}
 	runloop() {
-		setInterval(()=>{
+		var timer = setInterval(()=>{
 			var keys = Object.keys(this.actions)
 			for (var i = 0; i < keys.length; i++) {
 				var key = keys[i]
@@ -104,24 +112,36 @@ class Snake {
 					this.actions[key]()
 				}
 			}
+			if (this.paused || this.end) {return false}
 			this.move()
 		}, 1000/5)
+		if (this.end) {
+			// 游戏结束，清空定时器
+			clearInterval(timer)
+		}
 	}
 	// snake move
 	move() {
 		var snake = this.snakeGrid
+		var food = this.foodGrid
+		var foodX = this.foodGrid[0][1]
+		var foodY = this.foodGrid[0][0]
 		var headX = this.snakeGrid[0][1]
 		var headY = this.snakeGrid[0][0]
 		headX += this.direction.x
 		headY += this.direction.y
-		// log(headX, headY, x, y)
-		if(this.eatFood()) {
-			log('food')
+		// log(headX, headY, foodX, foodY)
+		if(headX == foodX && headY == foodY) {
+			// log('food')
+			snake.unshift([foodY, foodX])
+			this.initFood()
 		} else {
 			// log('move')
 			// 撞墙
 			if (headX<0  || headY<0 || headX>=20 || headY>=20) {
-				log('wall')
+				// log('wall')
+				alert('笨蛋！撞墙了！')
+				this.end = true
 				return false
 			}
 			// snake body position
@@ -131,9 +151,9 @@ class Snake {
 			// snake head position
 			snake[0] = [headY, headX]
 			// log(snake)
+			// clear
+			this.clear(['black', 'red'])
 		}
-		// clear
-		this.clear(['black', 'red'])
 		// draw
 		this.drawSnake()
 	}
@@ -156,9 +176,6 @@ class Snake {
 		if(this.direction.y == -1) return
 		this.direction.x = 0
 		this.direction.y = +1
-	}
-	eatFood() {
-		return false
 	}
 	eatSelf() {
 		return false
