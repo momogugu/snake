@@ -13,15 +13,15 @@ class Snake {
 		this.paused = true
 		// 游戏结束
 		this.end = false
-		this.keys = {}
-		this.actions = {}
-		window.addEventListener('keydown', (event) => {
-			// log(event.key)
-			this.keys[event.key] = true
-		})
-		window.addEventListener('keyup', (event) => {
-			this.keys[event.key] = false
-		})
+		// this.keys = {}
+		// this.actions = {}
+		// window.addEventListener('keydown', (event) => {
+		// 	// log(event.key)
+		// 	this.keys[event.key] = true
+		// })
+		// window.addEventListener('keyup', (event) => {
+		// 	this.keys[event.key] = false
+		// })
 		this.setup()
 		this.init(width, height)
 	}
@@ -69,8 +69,8 @@ class Snake {
 	// init food
 	initFood() {
 		this.foodGrid = []
-		var x = Math.floor(Math.random()*20)
-		var y = Math.floor(Math.random()*20)
+		var x = this.randomBetween(0, 19)
+		var y = this.randomBetween(0, 19)
 		this.foodGrid.push([x, y])
 		this.drawFood()
 	}
@@ -90,28 +90,48 @@ class Snake {
 		this.runloop()
 	}
 	// register events
-	registeraction(key, callback) {
-		this.actions[key] = callback
-	}
+	// registeraction(key, callback) {
+	// 	this.actions[key] = callback
+	// }
 	// events
 	setup() {
-		this.registeraction('d', this.moveRight.bind(this))
-		this.registeraction('a', this.moveLeft.bind(this))
-		this.registeraction('w', this.moveUp.bind(this))
-		this.registeraction('s', this.moveDown.bind(this))
-		this.registeraction(' ', () => {
-			this.paused = !this.paused
+		window.addEventListener('keydown', event => {
+			var key = event.key
+			switch(key) {
+				case 'd':
+					this.moveRight()
+					break
+				case 'a':
+					this.moveLeft()
+					break
+				case 'w':
+					this.moveUp()
+					break
+				case 's':
+					this.moveDown()
+					break
+				case ' ':
+					this.paused = !this.paused
+					break
+			}
 		})
+		// this.registeraction('d', this.moveRight.bind(this))
+		// this.registeraction('a', this.moveLeft.bind(this))
+		// this.registeraction('w', this.moveUp.bind(this))
+		// this.registeraction('s', this.moveDown.bind(this))
+		// this.registeraction(' ', () => {
+		// 	this.paused = !this.paused
+		// })
 	}
 	runloop() {
-		var timer = setInterval(()=>{
-			var keys = Object.keys(this.actions)
-			for (var i = 0; i < keys.length; i++) {
-				var key = keys[i]
-				if (this.keys[key]) {
-					this.actions[key]()
-				}
-			}
+		setInterval(()=>{
+			// var keys = Object.keys(this.actions)
+			// for (var i = 0; i < keys.length; i++) {
+			// 	var key = keys[i]
+			// 	if (this.keys[key]) {
+			// 		this.actions[key]()
+			// 	}
+			// }
 			if (this.paused || this.end) {return false}
 			this.move()
 		}, 1000/5)
@@ -190,6 +210,11 @@ class Snake {
 				e[j].classList.remove(classname)
 			}
 		}
+	}
+	// 生成随机数
+	randomBetween(start, end) {
+		var n = Math.random()*(end-start+1)+start
+		return Math.floor(n)
 	}
 }
 
